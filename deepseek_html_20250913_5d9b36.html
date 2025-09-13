@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Profit Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .calculator h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #00c6ff;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00c6ff;
+            box-shadow: 0 0 0 2px rgba(0, 198, 255, 0.2);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .result-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .profit {
+            color: #00ff8c;
+        }
+
+        .loss {
+            color: #ff3860;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            height: 200px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 30%;
+            left: 10%;
+            background: linear-gradient(to top, #0072ff, #00c6ff);
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .chart-bar.sell {
+            left: 60%;
+            background: linear-gradient(to top, #00ff8c, #00d977);
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -30px;
+            width: 30%;
+            text-align: center;
+            left: 10%;
+        }
+
+        .chart-label.sell {
+            left: 60%;
+        }
+
+        .disclaimer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Crypto Profit Calculator</h1>
+        <p class="tagline">Calculate your potential cryptocurrency gains and losses</p>
+    </header>
+
+    <div class="container">
+        <div class="calculator">
+            <h2>Investment Details</h2>
+            <div class="input-group">
+                <label for="investment">Initial Investment ($)</label>
+                <input type="number" id="investment" placeholder="Enter amount" value="1000">
+            </div>
+            <div class="input-group">
+                <label for="buyPrice">Buy Price ($)</label>
+                <input type="number" id="buyPrice" placeholder="Price per coin" value="50000">
+            </div>
+            <div class="input-group">
+                <label for="sellPrice">Sell Price ($)</label>
+                <input type="number" id="sellPrice" placeholder="Price per coin" value="60000">
+            </div>
+            <div class="input-group">
+                <label for="coins">Coins (Optional)</label>
+                <input type="number" id="coins" placeholder="Calculated automatically">
+            </div>
+            <button class="calculate-btn" id="calculate">Calculate Profit/Loss</button>
+
+            <div class="results">
+                <div class="result-box">
+                    <div class="result-title">Coins</div>
+                    <div class="result-value" id="coinsResult">0.02</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-title">Investment Value</div>
+                    <div class="result-value" id="investmentResult">$1,000.00</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-title">Final Value</div>
+                    <div class="result-value" id="finalResult">$1,200.00</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-title">Profit/Loss</div>
+                    <div class="result-value" id="profitResult">$200.00</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-title">ROI</div>
+                    <div class="result-value" id="roiResult">20.00%</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-title">Profit/Loss %</div>
+                    <div class="result-value" id="profitPercentResult">20.00%</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-bar" id="buyChart"></div>
+                <div class="chart-bar sell" id="sellChart"></div>
+                <div class="chart-label">Buy Price</div>
+                <div class="chart-label sell">Sell Price</div>
+            </div>
+
+            <p class="disclaimer">Disclaimer: This calculator is for illustrative purposes only and does not represent financial advice.</p>
+        </div>
+
+        <div class="calculator">
+            <h2>How It Works</h2>
+            <p style="margin-bottom: 20px;">Our calculator helps you determine the potential profit or loss from your cryptocurrency investments.</p>
+            
+            <h3 style="margin: 25px 0 15px; color: #00c6ff;">Instructions:</h3>
+            <ol style="padding-left: 20px; margin-bottom: 25px;">
+                <li style="margin-bottom: 10px;">Enter your initial investment amount in USD</li>
+                <li style="margin-bottom: 10px;">Input the buy price of the cryptocurrency</li>
+                <li style="margin-bottom: 10px;">Input the expected sell price</li>
+                <li style="margin-bottom: 10px;">Click "Calculate Profit/Loss" to see results</li>
+            </ol>
+            
+            <h3 style="margin: 25px 0 15px; color: #00c6ff;">Calculations:</h3>
+            <ul style="padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Coins:</strong> Investment Amount / Buy Price</li>
+                <li style="margin-bottom: 10px;"><strong>Final Value:</strong> Coins × Sell Price</li>
+                <li style="margin-bottom: 10px;"><strong>Profit/Loss:</strong> Final Value - Investment Amount</li>
+                <li style="margin-bottom: 10px;"><strong>ROI:</strong> (Profit / Investment) × 100%</li>
+            </ul>
+            
+            <div style="margin-top: 30px; padding: 20px; background: rgba(0, 0, 0, 0.2); border-radius: 10px;">
+                <h3 style="margin-bottom: 15px; color: #00c6ff;">Pro Tip:</h3>
+                <p>You can enter the number of coins directly instead of the investment amount. The calculator will automatically compute the investment value based on the buy price.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Crypto Profit Calculator © 2023 | All calculations are estimates</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const investmentInput = document.getElementById('investment');
+            const buyPriceInput = document.getElementById('buyPrice');
+            const sellPriceInput = document.getElementById('sellPrice');
+            const coinsInput = document.getElementById('coins');
+            const calculateBtn = document.getElementById('calculate');
+            
+            // Result elements
+            const coinsResult = document.getElementById('coinsResult');
+            const investmentResult = document.getElementById('investmentResult');
+            const finalResult = document.getElementById('finalResult');
+            const profitResult = document.getElementById('profitResult');
+            const roiResult = document.getElementById('roiResult');
+            const profitPercentResult = document.getElementById('profitPercentResult');
+            
+            // Chart elements
+            const buyChart = document.getElementById('buyChart');
+            const sellChart = document.getElementById('sellChart');
+            
+            // Initialize with default values
+            calculateProfit();
+            
+            // Add event listeners
+            calculateBtn.addEventListener('click', calculateProfit);
+            
+            investmentInput.addEventListener('input', function() {
+                coinsInput.value = '';
+                calculateProfit();
+            });
+            
+            buyPriceInput.addEventListener('input', calculateProfit);
+            sellPriceInput.addEventListener('input', calculateProfit);
+            
+            coinsInput.addEventListener('input', function() {
+                investmentInput.value = '';
+                calculateProfit();
+            });
+            
+            function calculateProfit() {
+                // Get input values
+                let investment = parseFloat(investmentInput.value) || 0;
+                const buyPrice = parseFloat(buyPriceInput.value) || 0;
+                const sellPrice = parseFloat(sellPriceInput.value) || 0;
+                const coins = parseFloat(coinsInput.value) || 0;
+                
+                let calculatedCoins = coins;
+                
+                // Calculate coins if investment is provided
+                if (investment > 0 && buyPrice > 0) {
+                    calculatedCoins = investment / buyPrice;
+                }
+                
+                // Calculate investment if coins are provided
+                if (coins > 0 && buyPrice > 0) {
+                    investment = coins * buyPrice;
+                    investmentInput.value = investment.toFixed(2);
+                }
+                
+                // Calculate results
+                const finalValue = calculatedCoins * sellPrice;
+                const profit = finalValue - investment;
+                const roi = investment > 0 ? (profit / investment) * 100 : 0;
+                const profitPercent = buyPrice > 0 ? ((sellPrice - buyPrice) / buyPrice) * 100 : 0;
+                
+                // Update results
+                coinsResult.textContent = calculatedCoins.toFixed(6);
+                investmentResult.textContent = formatCurrency(investment);
+                finalResult.textContent = formatCurrency(finalValue);
+                
+                // Style profit/loss accordingly
+                if (profit >= 0) {
+                    profitResult.className = 'result-value profit';
+                    profitResult.textContent = formatCurrency(profit);
+                } else {
+                    profitResult.className = 'result-value loss';
+                    profitResult.textContent = formatCurrency(profit);
+                }
+                
+                roiResult.textContent = roi.toFixed(2) + '%';
+                
+                if (roi >= 0) {
+                    roiResult.className = 'result-value profit';
+                } else {
+                    roiResult.className = 'result-value loss';
+                }
+                
+                profitPercentResult.textContent = profitPercent.toFixed(2) + '%';
+                
+                if (profitPercent >= 0) {
+                    profitPercentResult.className = 'result-value profit';
+                } else {
+                    profitPercentResult.className = 'result-value loss';
+                }
+                
+                // Update chart
+                updateChart(buyPrice, sellPrice);
+            }
+            
+            function formatCurrency(amount) {
+                return '$' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
+            
+            function updateChart(buyPrice, sellPrice) {
+                if (buyPrice <= 0 || sellPrice <= 0) return;
+                
+                const maxPrice = Math.max(buyPrice, sellPrice) * 1.1;
+                const buyHeight = (buyPrice / maxPrice) * 100;
+                const sellHeight = (sellPrice / maxPrice) * 100;
+                
+                buyChart.style.height = buyHeight + '%';
+                sellChart.style.height = sellHeight + '%';
+            }
+        });
+    </script>
+</body>
+</html>
